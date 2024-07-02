@@ -1,3 +1,6 @@
+import DOCS from './help.html'
+
+
 addEventListener("fetch", (event) => {
   event.passThroughOnException();
   event.respondWith(handleRequest(event.request));
@@ -7,7 +10,7 @@ const dockerHub = "https://registry-1.docker.io";
 
 const routes = {
   // production
-  "docker.bpood.com": "https://registry-1.docker.io",
+  "docker.bpood.com": dockerHub,
   "quay.bpood.com": "https://quay.io",
   "gcr.bpood.com": "https://gcr.io",
   "k8s-gcr.bpood.com": "https://k8s.gcr.io",
@@ -17,7 +20,7 @@ const routes = {
   "ecr.bpood.com": "https://public.ecr.aws",
 
   // staging
-  "docker-staging.libcuda.so": dockerHub,
+  "docker-staging.bpood.com": dockerHub,
 };
 
 function routeByHosts(host) {
@@ -43,6 +46,17 @@ async function handleRequest(request) {
       }
     );
   }
+
+  // return docs
+  if (url.pathname === "/") {
+    return new Response(DOCS, {
+      status: 200,
+      headers: {
+        "content-type": "text/html"
+      }
+    });
+  }
+
   const isDockerHub = upstream == dockerHub;
   const authorization = request.headers.get("Authorization");
   if (url.pathname == "/v2/") {
